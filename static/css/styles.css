@@ -1,0 +1,47 @@
+/* Fondo degradado */
+.bg-gradient {
+    background: linear-gradient(180deg, #4facfe, #00f2fe);
+    min-height: 100vh;
+}
+
+/* Título con degradado */
+.title-gradient {
+    background: linear-gradient(90deg, #1a73e8, #00f2fe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    font-weight: bold;
+    font-size: 2.5rem;
+}
+
+/* Botón con degradado */
+.btn-gradient {
+    background: linear-gradient(90deg, #1a73e8, #00f2fe);
+    border: none;
+    color: white;
+    transition: background 0.3s ease;
+}
+
+.btn-gradient:hover {
+    background: linear-gradient(90deg, #00f2fe, #1a73e8);
+}
+
+/* Gráfico */
+.card {
+    border-radius: 15px;
+}
+
+.card .card-title {
+    font-size: 1.25rem;
+}
+
+/* Input con sombra */
+.form-control {
+    border-radius: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.form-control:focus {
+    box-shadow: 0 0 5px rgba(30, 144, 255, 0.5);
+    border-color: rgba(30, 144, 255, 0.5);
+}

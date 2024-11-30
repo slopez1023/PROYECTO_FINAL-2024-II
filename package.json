@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "firebase": "^11.0.2",
+    "plotly.js-dist-min": "^2.35.2"
+  }
+}

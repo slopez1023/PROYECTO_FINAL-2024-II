@@ -18,16 +18,16 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-<!-- Fondo degradado -->
-<div class="bg-gradient">
+<!-- Fondo animado -->
+<div class="bg-animated">
     <div class="container py-5">
         <!-- Título Principal -->
-        <h1 class="text-center mb-4 title-gradient">
+        <h1 class="text-center mb-4 title-gradient animate-title">
             <i class="fa-solid fa-wind"></i> Visualización de Datos del Anemómetro
         </h1>
 
         <!-- Filtros -->
-        <div class="card mb-4 shadow-sm border-0">
+        <div class="card mb-4 shadow-lg border-0">
             <div class="card-body">
                 <h5 class="card-title text-secondary">
                     <i class="fa-solid fa-filter"></i> Filtros de Fechas
@@ -51,7 +51,7 @@
         </div>
 
         <!-- Gráfico -->
-        <div class="card shadow-lg border-0 bg-dark text-light">
+        <div class="card shadow-lg border-0 bg-dark text-light animate-card">
             <div class="card-body">
                 <h5 class="card-title text-center text-white">
                     <i class="fa-solid fa-chart-line"></i> Velocidad del Viento
@@ -61,7 +61,7 @@
         </div>
 
         <!-- Mensaje de Error -->
-        <p id="error" class="text-danger mt-3 text-center" style="display: none;">
+        <p id="error" class="text-danger mt-3 text-center animate-error" style="display: none;">
             <i class="fa-solid fa-exclamation-triangle"></i> Error al cargar los datos.
         </p>
     </div>

@@ -26,7 +26,7 @@ def generar_datos_periodicamente():
             datos_sensores.pop(0)
         datos_sensores.append(nuevo_dato)
 
-        sleep(5)  # Espera 3 segundos antes de generar otro dato
+        sleep(15)  # Espera 15 segundos antes de generar otro dato
 
 @app.route("/")
 def index():

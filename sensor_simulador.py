@@ -6,7 +6,7 @@ from datetime import datetime
 # Configuración del simulador
 SENSOR_ID = "ANEM001"
 API_URL = "http://127.0.0.1:5000/api/data"
-INTERVAL = 3  # Intervalo de tiempo entre lecturas en segundos
+INTERVAL = 15  # Intervalo de tiempo entre lecturas en segundos
 
 def generar_direccion_viento():
     """Genera una dirección de viento aleatoria."""

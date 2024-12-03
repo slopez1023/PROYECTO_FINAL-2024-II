@@ -39,11 +39,11 @@ def receive_data():
         # Extraer los datos del cuerpo de la solicitud
         data = request.get_json()
 
-        # Validar que el sensor enviado corresponde a un anemómetro
-        if data.get("idsensor") != "ANEM001":
+        # Validar que el idsensor esté en la lista de sensores permitidos
+        if data.get("idsensor") not in ["ANEM001", "ANEM002", "ANEM003", "ANEM004"]:
             return jsonify({
                 "status": "error",
-                "message": "El sensor no es reconocido como un anemómetro."
+                "message": f"El sensor {data.get('idsensor')} no está permitido."
             }), 400
 
         # Agregar la fecha y hora actuales a los datos
@@ -59,7 +59,6 @@ def receive_data():
     except Exception as e:
         # Manejo de excepciones genéricas
         return jsonify({"status": "error", "message": str(e)}), 500
-
 @api_app.route("/api/sensor/anemometro", methods=["GET"])
 def get_anemometer_data():
     """
@@ -75,15 +74,30 @@ def get_anemometer_data():
 
     """
     try:
+        # Recuperar el identificador del sensor de los parámetros de consulta
+        idsensor = request.args.get("idsensor")
+        if not idsensor:
+            return jsonify({
+                "status": "error",
+                "message": "Debe especificar el identificador del sensor (idsensor)."
+            }), 400
+
+        # Validar que el idsensor esté permitido
+        if idsensor not in ["ANEM001", "ANEM002", "ANEM003", "ANEM004"]:  # Ajusta según tu lista
+            return jsonify({
+                "status": "error",
+                "message": f"El sensor {idsensor} no está permitido."
+            }), 400
+
         # Obtener todos los datos de la colección 'sensores'
         datos = firebase_db.obtener_datos("sensores")
 
-        # Filtrar los datos correspondientes al sensor anemómetro
-        anemometro_datos = [dato for dato in datos if dato.get("idsensor") == "ANEM001"]
+        # Filtrar los datos correspondientes al sensor solicitado
+        sensor_datos = [dato for dato in datos if dato.get("idsensor") == idsensor]
 
         return jsonify({
             "status": "success",
-            "data": anemometro_datos
+            "data": sensor_datos
         }), 200
     except Exception as e:
         # Manejo de excepciones genéricas

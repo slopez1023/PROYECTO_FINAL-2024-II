@@ -73,6 +73,7 @@
                 <table class="table table-striped table-hover">
                     <thead>
                     <tr>
+                        <th scope="col">ID Sensor</th>
                         <th scope="col">Hora</th>
                         <th scope="col">Velocidad (km/h)</th>
                         <th scope="col">Dirección</th>
@@ -100,14 +101,8 @@
     const chart = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: [],
-            datasets: [{
-                label: 'Velocidad del Viento (km/h)',
-                data: [],
-                borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                fill: true,
-            }]
+            labels: [], // Hora
+            datasets: [] // Cada dataset será un sensor
         },
         options: {
             responsive: true,
@@ -125,23 +120,47 @@
             if (!response.ok) throw new Error("Error en la respuesta del servidor");
             const data = await response.json();
 
+            // Organizar datos por sensor
+            const datosPorSensor = {};
+            data.forEach(d => {
+                if (!d.idsensor) {
+                    d.idsensor = "Desconocido"; // Asegurarse de que siempre haya un ID
+                }
+                if (!datosPorSensor[d.idsensor]) {
+                    datosPorSensor[d.idsensor] = { horas: [], velocidades: [] };
+                }
+                datosPorSensor[d.idsensor].horas.push(d.hora);
+                datosPorSensor[d.idsensor].velocidades.push(d.velocidad);
+            });
+
             // Actualizar Gráfico
             chart.data.labels = data.map(d => d.hora);
-            chart.data.datasets[0].data = data.map(d => d.velocidad);
+            chart.data.datasets = Object.keys(datosPorSensor).map((idsensor, idx) => ({
+                label: `Sensor ${idsensor}`,
+                data: datosPorSensor[idsensor].velocidades,
+                borderColor: `hsl(${(idx * 40) % 360}, 70%, 50%)`,
+                backgroundColor: `hsl(${(idx * 40) % 360}, 70%, 70%)`,
+                fill: true,
+            }));
             chart.update();
 
             // Actualizar Tabla
             const tabla = document.getElementById('tabla-datos');
             tabla.innerHTML = ''; // Limpiar tabla
-            data.forEach(d => {
-                const fila = `
+            if (data.length === 0) {
+                tabla.innerHTML = '<tr><td colspan="4" class="text-center">No se encontraron datos</td></tr>';
+            } else {
+                data.forEach(d => {
+                    const fila = `
                     <tr>
+                        <td>${d.idsensor}</td>
                         <td>${d.hora}</td>
                         <td>${d.velocidad}</td>
                         <td>${d.direccion || 'N/A'}</td>
                     </tr>`;
-                tabla.innerHTML += fila;
-            });
+                    tabla.innerHTML += fila;
+                });
+            }
 
             document.getElementById("error").style.display = "none";
         } catch (error) {
@@ -150,22 +169,19 @@
         }
     }
 
-    // Modo Tiempo Real
+
+    // Inicia en modo tiempo real por defecto
     function iniciarTiempoReal() {
+        if (modoHistorico) {
+            clearInterval(intervaloTiempoReal); // Limpiar intervalo si estaba en modo histórico
+        }
         modoHistorico = false;
         intervaloTiempoReal = setInterval(() => actualizarDatos('/api/data'), 5000);
         actualizarDatos('/api/data');
-        document.getElementById('mostrar-tiempo-real').disabled = true; // Deshabilitar botón
+        document.getElementById('mostrar-tiempo-real').disabled = true; // Evitar múltiples clics
     }
 
-    // Detener Tiempo Real
-    function detenerTiempoReal() {
-        clearInterval(intervaloTiempoReal);
-        intervaloTiempoReal = null;
-        document.getElementById('mostrar-tiempo-real').disabled = false;
-    }
 
-    // Aplicar Filtros (Modo Histórico)
     document.getElementById('aplicar-filtro').addEventListener('click', () => {
         const inicio = document.getElementById('inicio').value;
         const fin = document.getElementById('fin').value;
@@ -176,18 +192,18 @@
         }
 
         const url = `/api/data/filtrar?inicio=${inicio}&fin=${fin}`;
-        detenerTiempoReal();
-        modoHistorico = true;
-        actualizarDatos(url);
+        clearInterval(intervaloTiempoReal); // Detener el tiempo real
+        modoHistorico = true; // Cambiar a modo histórico
+        actualizarDatos(url); // Actualizar datos con el filtro
+        document.getElementById('mostrar-tiempo-real').disabled = false; // Reactivar botón
     });
 
-    // Botón para Mostrar Tiempo Real
+
     document.getElementById('mostrar-tiempo-real').addEventListener('click', () => {
-        if (!modoHistorico) return;
-        iniciarTiempoReal();
+        clearInterval(intervaloTiempoReal); // Detener cualquier intervalo existente
+        iniciarTiempoReal(); // Reiniciar el modo de tiempo real
     });
 
-    // Inicia en modo tiempo real por defecto
     iniciarTiempoReal();
 </script>
 
